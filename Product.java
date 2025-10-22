@@ -1,25 +1,25 @@
-/**
- * Represents a product in the supermarket with serial number, name, and price.
- */
+/*
+ * This class makes / identify a product or creates a product according to its serialNumber, name, price, type (type of product)
+*/
 public class Product {
     private String serialNumber;
     private String name;
     private double price;
-    private String productType;
-    
-    // Main constructor
-    public Product(String serialNumber, String name, double price, String productType) {
+    private String type;
+
+    // Main Constructor
+    public Product(String serialNumber, String name, double price, String type) {
         this.serialNumber = serialNumber;
         this.name = name;
         this.price = price;
-        this.productType = productType;
+        this.type = type;
     }
-    
+
     // Getters
     public String getSerialNumber() {
         return serialNumber;
     }
-    
+
     public String getName() {
         return name;
     }
@@ -28,48 +28,37 @@ public class Product {
         return price;
     }
 
-    public String getProductType() {
-        return productType;
+    public String getType() {
+        return type;
     }
-    
-    // This checks if the product is consumable returns true or false
-    public boolean isConsumable() {
-        String[] consumableTypes = {
-            "Fruit", "Chicken", "Beef", "Seafood", "Cereal", 
-            "Noodles", "Snacks", "Canned Goods", "Condiments", 
-            "Soft drink", "Juice", "Alcohol"
-        };
-        
-        for (String type : consumableTypes) {
-            if (productType.equals(type)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    // This check if it is a food excluding drinks, returns true or false
+
+    // Check if product is food
     public boolean isFood() {
-        String[] foodTypes = {
-            "Fruit", "Chicken", "Beef", "Seafood", "Cereal", 
-            "Noodles", "Snacks", "Canned Goods", "Condiments"
-        };
-        
-        for (String type : foodTypes) {
-            if (productType.equals(type)) {
-                return true;
-            }
+        if (type.equals("FRUIT") || type.equals("CHICKEN") || type.equals("BEEF") || 
+            type.equals("SEAFOOD") || type.equals("CEREAL") || type.equals("NOODLES") || 
+            type.equals("SNACKS") || type.equals("CANNED_GOODS") || type.equals("CONDIMENTS")) {
+            return true;
         }
         return false;
     }
-    
-    // This one checks if the product is a beverage
+
+    // Check if product is beverage
     public boolean isBeverage() {
-        return productType.equals("Soft drink") || 
-               productType.equals("Juice") || 
-               productType.equals("Alcohol");
+        if (type.equals("SOFT_DRINK") || type.equals("JUICE") || type.equals("ALCOHOL")) {
+            return true;
+        }
+        return false;
     }
-    
+
+    // Check if product can be eaten or drunk
+    public boolean isConsumable() {
+        if (isFood() == true || isBeverage() == true) {
+            return true;
+        }
+        return false;
+    }
+
+    // Get what type of display this product needs
     public String getDisplayType() {
         if (type.equals("FRUIT")) {
             return "TABLE";
