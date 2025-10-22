@@ -70,8 +70,13 @@ public class Product {
                productType.equals("Alcohol");
     }
     
-    @Override
-    public String toString() {
-        return String.format("%s - %s (₱%.2f)", serialNumber, name, price);
+    public String getDisplayType() {
+        if (type.equals("FRUIT")) {
+            return "TABLE";
+        } else if (type.equals("CHICKEN") || type.equals("BEEF") || type.equals("SEAFOOD")) {
+            return "CHILLED_COUNTER";
+        } else {
+            return "SHELF";
+        }
     }
 }
