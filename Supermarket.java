@@ -28,7 +28,6 @@ public class Supermarket {
     }
     
     private void addWalls() {
-        // Outer walls
         for (int i = 0; i < 22; i++) {
             groundFloor[0][i] = 'W'; 
             groundFloor[21][i] = 'W'; 
