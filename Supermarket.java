@@ -400,6 +400,6 @@ class Stairs extends Service {
     
     @Override
     public String interact(Shopper shopper) {
-        return "Stairs to second floor (MCO2 feature)";
+        return "Stairs to second floor (second floor agad? MCO2 pa yan)";
     }
 }
