@@ -17,7 +17,7 @@ public class SupermarketSimulator {
         
         System.out.print("Enter shopper age: ");
         int age = scanner.nextInt();
-        scanner.nextLine(); 
+        scanner.nextLine();
         
         Shopper shopper = new Shopper(name, age);
         supermarket.setShopper(shopper);
@@ -34,22 +34,30 @@ public class SupermarketSimulator {
             String input = scanner.nextLine().toUpperCase();
             
             switch (input) {
-                case "W": moveShopper("NORTH"); break;
-                case "A": moveShopper("WEST"); break;
-                case "S": moveShopper("SOUTH"); break;
-                case "D": moveShopper("EAST"); break;
-                case "I": changeDirection("NORTH"); break;
-                case "J": changeDirection("WEST"); break;
-                case "K": changeDirection("SOUTH"); break;
-                case "L": changeDirection("EAST"); break;
-                case " ": interact(); break;
-                case "V": viewProducts(); break;
-                case "Q": 
-                    running = false;
-                    System.out.println("Thank you for shopping!");
-                    break;
-                default:
-                    System.out.println("Invalid command. Please try again.");
+                case "N": 
+                moveShopper("NORTH");
+                changeDirection("NORTH"); 
+                break;
+            case "W": 
+                moveShopper("WEST");
+                changeDirection("WEST"); 
+                break;
+            case "S": 
+                moveShopper("SOUTH"); 
+                changeDirection("SOUTH"); 
+                break;
+            case "E": 
+                moveShopper("EAST");
+                changeDirection("EAST"); 
+                break;
+            case " ": interact(); break;
+            case "V": viewProducts(); break;
+            case "Q": 
+                running = false;
+                System.out.println("Thank you for shopping!");
+                break;
+            default:
+                System.out.println("Invalid command. Please try again.");
             }
         }
         
@@ -58,8 +66,8 @@ public class SupermarketSimulator {
     
     private void displayControls() {
     System.out.println("\n=============================");
-    System.out.println("Movement: W (North), A (West), S (South), D (East)");
-    System.out.println("Vision: I (North), J (West), K (South), L (East)");
+    System.out.println("Movement: N (North), W (West), S (South), E (East)");
+    System.out.println("Vision: N (North), W (West), S (South), E (East)");
     System.out.println("Interact: SPACE");
     System.out.println("View Products: V");
     System.out.println("Quit: Q");
