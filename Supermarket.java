@@ -28,10 +28,11 @@ public class Supermarket {
     }
     
     private void addWalls() {
+        // Outer walls
         for (int i = 0; i < 22; i++) {
             groundFloor[0][i] = 'W'; 
             groundFloor[21][i] = 'W'; 
-            groundFloor[i][0] = 'W';
+            groundFloor[i][0] = 'W'; 
             groundFloor[i][21] = 'W'; 
         }
         
@@ -132,58 +133,119 @@ public class Supermarket {
         stockTableProducts();
     }
     
-    private void stockChilledCounterProducts() {
-        int productCount = 1;
-        for (Display display : displays.values()) {
-            if (display instanceof ChilledCounter) {
-                if (productCount % 3 == 1) {
-                    display.addProduct(new Product("CHK0000" + productCount, "Chicken Breast", 180.0, "CHICKEN"), 0);
-                } else if (productCount % 3 == 2) {
-                    display.addProduct(new Product("BEF0000" + productCount, "Beef Rib", 350.0, "BEEF"), 0);
-                } else {
-                    display.addProduct(new Product("SEA0000" + productCount, "Tilapia", 120.0, "SEAFOOD"), 0);
-                }
-                productCount++;
+private void stockChilledCounterProducts() {
+    int productCount = 1;
+    for (Display display : displays.values()) {
+        if (display instanceof ChilledCounter) {
+            if (productCount % 3 == 1) {
+                display.addProduct(new Product("CHK00" + String.format("%03d", productCount), "Chicken Breast", 180.0, "CHICKEN"), 0);
+                display.addProduct(new Product("CHK00" + String.format("%03d", productCount+1), "Chicken Thighs", 160.0, "CHICKEN"), 1);
+            } else if (productCount % 3 == 2) {
+                display.addProduct(new Product("BEF00" + String.format("%03d", productCount), "Beef Rib", 350.0, "BEEF"), 0);
+                display.addProduct(new Product("BEF00" + String.format("%03d", productCount+1), "Ground Beef", 280.0, "BEEF"), 1);
+            } else {
+                display.addProduct(new Product("SEA00" + String.format("%03d", productCount), "Tilapia", 120.0, "SEAFOOD"), 0);
+                display.addProduct(new Product("SEA00" + String.format("%03d", productCount+1), "Shrimp", 280.0, "SEAFOOD"), 1);
             }
+            productCount++;
         }
     }
+}
     
     private void stockShelfProducts() {
-        String[][] shelfProducts = {
-            {"CER00001,Java Cereal,120.0,CEREAL", "CER00002,OOPsie Oaties,150.0,CEREAL"},
-            {"NDL00001,Instant Noodles,15.0,NOODLES", "NDL00002,Ramen Pack,25.0,NOODLES"},
-            {"SNK00001,Chocolate Cookies,45.0,SNACKS", "SNK00002,Potato Chips,35.0,SNACKS"},
-            {"CAN00001,Canned Tuna,35.0,CANNED_GOODS", "CAN00002,Canned Sardines,25.0,CANNED_GOODS"},
-            {"CON00001,Table Salt,12.0,CONDIMENTS", "CON00002,Black Pepper,15.0,CONDIMENTS"},
-            {"SFT00001,Cola Drink,25.0,SOFT_DRINK", "SFT00002,Lemon Soda,20.0,SOFT_DRINK"},
-            {"JUC00001,Orange Juice,40.0,JUICE", "JUC00002,Apple Juice,45.0,JUICE"},
-            {"ALC00001,Beer,80.0,ALCOHOL", "ALC00002,Wine,250.0,ALCOHOL"}
-        };
-        
-        int shelfIndex = 0;
-        for (Display display : displays.values()) {
-            if (display instanceof Shelf && shelfIndex < shelfProducts.length) {
-                String[] products = shelfProducts[shelfIndex % shelfProducts.length];
-                for (int i = 0; i < products.length && i < display.getCapacity(); i++) {
-                    String[] parts = products[i].split(",");
-                    Product product = new Product(parts[0], parts[1], Double.parseDouble(parts[2]), parts[3]);
-                    display.addProduct(product, i);
-                }
-                shelfIndex++;
-            }
+    String[][][] shelfProductGroups = {
+        { 
+            {"CER001", "Java Cereal", "120.0", "CEREAL"},
+            {"CER002", "OOPsie Oaties", "150.0", "CEREAL"},
+            {"CER003", "Barley Bytes", "110.0", "CEREAL"}
+        },
+        {  
+            {"NDL001", "Instant Noodles", "15.0", "NOODLES"},
+            {"NDL002", "Ramen Pack", "25.0", "NOODLES"},
+            {"NDL003", "Pasta", "45.0", "NOODLES"}
+        },
+        { 
+            {"SNK001", "Chocolate Cookies", "45.0", "SNACKS"},
+            {"SNK002", "Potato Chips", "35.0", "SNACKS"},
+            {"SNK003", "Candy Bars", "20.0", "SNACKS"}
+        },
+        {
+            {"CAN001", "Canned Tuna", "35.0", "CANNED_GOODS"},
+            {"CAN002", "Canned Sardines", "25.0", "CANNED_GOODS"},
+            {"CAN003", "Canned Corn", "30.0", "CANNED_GOODS"}
+        },
+        { 
+            {"CON001", "Table Salt", "12.0", "CONDIMENTS"},
+            {"CON002", "Black Pepper", "15.0", "CONDIMENTS"},
+            {"CON003", "Soy Sauce", "25.0", "CONDIMENTS"}
+        },
+        { 
+            {"SFT001", "Cola Drink", "25.0", "SOFT_DRINK"},
+            {"SFT002", "Lemon Soda", "20.0", "SOFT_DRINK"},
+            {"SFT003", "Sparkling Water", "15.0", "SOFT_DRINK"}
+        },
+        {
+            {"JUC001", "Orange Juice", "40.0", "JUICE"},
+            {"JUC002", "Apple Juice", "45.0", "JUICE"},
+            {"JUC003", "Pineapple Juice", "35.0", "JUICE"}
+        },
+        { 
+            {"ALC001", "Beer", "80.0", "ALCOHOL"},
+            {"ALC002", "Wine", "250.0", "ALCOHOL"},
+            {"ALC003", "Soju", "120.0", "ALCOHOL"}
+        }
+    };
+
+    Map<Integer, List<Display>> shelvesByX = new HashMap<>();
+    for (Display display : displays.values()) {
+        if (display instanceof Shelf) {
         }
     }
+
+    int groupIndex = 0;
+    for (Display display : displays.values()) {
+        if (display instanceof Shelf && groupIndex < shelfProductGroups.length) {
+            String[][] productGroup = shelfProductGroups[groupIndex];
+            for (int i = 0; i < productGroup.length && i < display.getCapacity(); i++) {
+                String[] productData = productGroup[i];
+                Product product = new Product(
+                    productData[0], 
+                    productData[1], 
+                    Double.parseDouble(productData[2]), 
+                    productData[3]
+                );
+                display.addProduct(product, i);
+            }
+            groupIndex++;
+        }
+    }
+}
     
     private void stockTableProducts() {
-        int fruitCount = 1;
-        for (Display display : displays.values()) {
-            if (display instanceof Table) {
-                String[] fruits = {"Apple", "Banana", "Orange", "Grapes", "Mango", "Pineapple"};
-                display.addProduct(new Product("FRU0000" + fruitCount, fruits[fruitCount % fruits.length], 20 + (fruitCount * 5), "FRUIT"), 0);
-                fruitCount++;
+    String[][] fruitGroups = {
+        {"Apple", "Banana", "Orange"},
+        {"Grapes", "Mango", "Pineapple"},
+        {"Watermelon", "Strawberry", "Kiwi"},
+        {"Peach", "Pear", "Plum"}
+    };
+
+    int groupIndex = 0;
+    for (Display display : displays.values()) {
+        if (display instanceof Table && groupIndex < fruitGroups.length) {
+            String[] fruits = fruitGroups[groupIndex];
+            for (int i = 0; i < fruits.length && i < display.getCapacity(); i++) {
+                Product product = new Product(
+                    "FRU00" + String.format("%03d", (groupIndex * 3 + i + 1)),
+                    fruits[i],
+                    20 + ((groupIndex * 3 + i) * 5),
+                    "FRUIT"
+                );
+                display.addProduct(product, i);
             }
+            groupIndex++;
         }
     }
+}
     
     public void displaySimpleMap() {
         Shopper shopper = getShopper();
@@ -198,7 +260,7 @@ public class Supermarket {
         for (int i = centerY - 2; i <= centerY + 2; i++) {
             for (int j = centerX - 2; j <= centerX + 2; j++) {
                 if (i < 0 || i >= 22 || j < 0 || j >= 22) {
-                    System.out.print("  ");
+                    System.out.print("  "); 
                 } else if (i == centerY && j == centerX) {
                     switch (shopper.getDirection()) {
                         case "NORTH": System.out.print("^ "); break;
@@ -210,7 +272,7 @@ public class Supermarket {
                     System.out.print(groundFloor[i][j] + " ");
                 }
             }
-            System.out.println();
+            System.out.println(); 
         }
         
         System.out.println("\nLegend: ^v<> = You, . = Free, W = Wall");
