@@ -14,6 +14,7 @@ public class Supermarket {
     }
     
     private void initializeMap() {
+
         for (int i = 0; i < 22; i++) {
             for (int j = 0; j < 22; j++) {
                 groundFloor[i][j] = '.'; 
@@ -30,7 +31,7 @@ public class Supermarket {
         for (int i = 0; i < 22; i++) {
             groundFloor[0][i] = 'W'; 
             groundFloor[21][i] = 'W'; 
-            groundFloor[i][0] = 'W'; 
+            groundFloor[i][0] = 'W';
             groundFloor[i][21] = 'W'; 
         }
         
@@ -87,11 +88,11 @@ public class Supermarket {
     private void addDisplay(String address, Display display, int x, int y) {
         displays.put(address, display);
         if (display instanceof Table) {
-            groundFloor[y][x] = 'T';
+            groundFloor[y][x] = 'T'; 
         } else if (display instanceof ChilledCounter) {
             groundFloor[y][x] = 'C'; 
         } else if (display instanceof Shelf) {
-            groundFloor[y][x] = 'S';
+            groundFloor[y][x] = 'S'; 
         }
     }
     
@@ -105,7 +106,7 @@ public class Supermarket {
         int[] checkoutX = {2, 4, 6, 8, 13, 15, 17, 19};
         for (int x : checkoutX) {
             services.add(new CheckoutCounter(x, 18));
-            groundFloor[18][x] = 'K';
+            groundFloor[18][x] = 'K'; 
         }
         
         services.add(new ProductSearch(8, 15, this));
@@ -338,6 +339,6 @@ class Stairs extends Service {
     
     @Override
     public String interact(Shopper shopper) {
-        return "Stairs to second floor (2nd floor agad? excited ka naman beh. MCO2 pa yan)";
+        return "Stairs to second floor (MCO2 feature)";
     }
 }
