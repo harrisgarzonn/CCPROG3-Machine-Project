@@ -35,7 +35,7 @@ public class ChilledCounter extends Display {
         if (products[slot] != null) {
             return false;
         }
-        if (canHoldProduct(product) == false) {
+        if (!canHoldProduct(product)) {
             return false;
         }
         products[slot] = product;
@@ -83,9 +83,6 @@ public class ChilledCounter extends Display {
 
     // Check if full
     public boolean isFull() {
-        if (getAvailableSlots() == 0) {
-            return true;
-        }
-        return false;
+        return getAvailableSlots() == 0;
     }
 }
