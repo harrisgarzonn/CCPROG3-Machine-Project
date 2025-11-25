@@ -1,5 +1,5 @@
 // This shelf class have 2 tiers, because there are a lot and different types of products for each
-// shelf. A shelf can contain 4 products (with different names / unique names (some producuts though))
+// shelf. A shelf can contain 4 products (with different names / unique names (some products though))
 public class Shelf extends Display {
     private String address;
     private int capacity;
@@ -44,7 +44,7 @@ public class Shelf extends Display {
 
     // Add product to a tier
     public boolean addProductToTier(Product product, int tier, int slot) {
-        if (canHoldProduct(product) == false) {
+        if (!canHoldProduct(product)) {
             return false;
         }
 
@@ -118,8 +118,8 @@ public class Shelf extends Display {
 
     // Check if product type is allowed
     public boolean canHoldProduct(Product product) {
-        for (int i = 0; i < allowedTypes.length; i++) {
-            if (product.getType().equals(allowedTypes[i])) {
+        for (String allowedType : allowedTypes) {
+            if (product.getType().equals(allowedType)) {
                 return true;
             }
         }
@@ -129,13 +129,13 @@ public class Shelf extends Display {
     // Count empty slots
     public int getAvailableSlots() {
         int count = 0;
-        for (int i = 0; i < tier1Products.length; i++) {
-            if (tier1Products[i] == null) {
+        for (Product tier1Product : tier1Products) {
+            if (tier1Product == null) {
                 count++;
             }
         }
-        for (int i = 0; i < tier2Products.length; i++) {
-            if (tier2Products[i] == null) {
+        for (Product tier2Product : tier2Products) {
+            if (tier2Product == null) {
                 count++;
             }
         }
@@ -144,10 +144,7 @@ public class Shelf extends Display {
 
     // Check if full
     public boolean isFull() {
-        if (getAvailableSlots() == 0) {
-            return true;
-        }
-        return false;
+        return getAvailableSlots() == 0;
     }
 
     // Add product to general slot
