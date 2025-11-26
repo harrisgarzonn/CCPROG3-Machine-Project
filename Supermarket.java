@@ -753,21 +753,11 @@ class Exit extends Service {
 
         // Allow shopper to leave
         shopper.setLeft(true);
-
-        // Show exit confirmation and close program
-        javafx.application.Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Exit Supermarket");
-            alert.setHeaderText("Thank you for shopping!");
-            alert.setContentText("You have left the supermarket. The program will now close.");
-            alert.showAndWait().ifPresent(response -> {
-                System.exit(0);
-            });
-        });
-
-        return "You have left the supermarket. Thank you for shopping!";
+        
+        return "You have successfully left the supermarket!";
     }
 }
+
 class Stairs extends Service {
     public Stairs(int x, int y, String floor) {
         super("STAIRS", x, y, floor);
