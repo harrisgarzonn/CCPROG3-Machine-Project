@@ -7,17 +7,21 @@ public class Shelf extends Display {
     private Product[] tier1Products;
     private Product[] tier2Products;
 
-    // Constructor
+    // Constructor - FIXED: Allow all shelf product types
     public Shelf(String address) {
         super(address, 8, new String[]{
             "CEREAL", "NOODLES", "SNACKS", "CANNED_GOODS", "CONDIMENTS",
-            "SOFT_DRINK", "JUICE", "ALCOHOL"
+            "SOFT_DRINK", "JUICE", "ALCOHOL", "PET_FOOD", "CLOTHES", 
+            "CLEANING_AGENTS", "HOME_ESSENTIALS", "STATIONERY", "DENTAL_CARE",
+            "HAIR_CARE", "BODY_CARE"
         });
         this.address = address;
         this.capacity = 8;
         this.allowedTypes = new String[]{
             "CEREAL", "NOODLES", "SNACKS", "CANNED_GOODS", "CONDIMENTS",
-            "SOFT_DRINK", "JUICE", "ALCOHOL"
+            "SOFT_DRINK", "JUICE", "ALCOHOL", "PET_FOOD", "CLOTHES", 
+            "CLEANING_AGENTS", "HOME_ESSENTIALS", "STATIONERY", "DENTAL_CARE",
+            "HAIR_CARE", "BODY_CARE"
         };
         this.tier1Products = new Product[4];
         this.tier2Products = new Product[4];
