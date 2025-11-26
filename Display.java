@@ -31,7 +31,8 @@ public abstract class Display {
         }
         return false;
     }
-    
+
+    // Getters
     public String getAddress() { return address; }
     public int getCapacity() { return capacity; }
     public String[] getAllowedTypes() { return allowedTypes; }
