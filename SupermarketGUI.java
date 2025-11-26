@@ -12,19 +12,30 @@ import javafx.stage.Stage;
 import java.util.HashMap;
 import java.util.Map;
 
+/*
+  JavaFX GUI application for the Supermarket Simulator.
+  Provides a graphical interface for navigating the supermarket,
+  interacting with displays and services, and managing shopping activities.
+ */
 public class SupermarketGUI extends Application {
-    private Supermarket supermarket;
-    private Shopper shopper;
+    private Supermarket supermarket; // Main supermarket model
+    private Shopper shopper; // Current shopper
     private Rectangle[][] mapTiles; // 2D array to store tile references
-    private GridPane mapGrid;
-    private TextArea infoArea;
-    private VBox controlPanel;
-    private Map<Character, String> tileDescriptions;
-    private Label statusLabel;
-    private Label floorLabel;
-    private Label positionLabel;
-    private Label equipmentLabel;
+    private GridPane mapGrid; // Grid layout for map display
+    private TextArea infoArea; // Text area for information display
+    private VBox controlPanel; // Panel for control buttons
+    private Map<Character, String> tileDescriptions; // Map tile descriptions
+    private Label statusLabel; // Status display label
+    private Label floorLabel; // Current floor display
+    private Label positionLabel;  // Shopper position display
+    private Label equipmentLabel; // Equipment status display
 
+
+    /*
+      Main entry point for JavaFX application
+      @param primaryStage The primary stage for this application
+     */
+        
     @Override
     public void start(Stage primaryStage) {
         initializeSupermarket();
@@ -32,7 +43,7 @@ public class SupermarketGUI extends Application {
 
         primaryStage.setTitle("Supermarket Simulator");
 
-        // Main layout
+        // Main layout using BorderPane for organized sections
         BorderPane mainLayout = new BorderPane();
         mainLayout.setStyle("-fx-background-color: #f0f0f0;");
 
@@ -75,6 +86,10 @@ public class SupermarketGUI extends Application {
         supermarket.setShopper(shopper);
     }
 
+     /*
+      Sets up descriptions for each map tile character
+      Used for tooltips and status display
+     */
     private void setupTileDescriptions() {
         tileDescriptions = new HashMap<>();
         tileDescriptions.put('W', "Wall");
@@ -92,6 +107,10 @@ public class SupermarketGUI extends Application {
         tileDescriptions.put('.', "Empty Space");
     }
 
+    /*
+      Creates container for the map display with floor label
+      @return VBox containing floor label and map grid
+     */
     private VBox createMapContainer() {
         VBox container = new VBox(10);
         container.setPadding(new Insets(10));
@@ -137,6 +156,7 @@ public class SupermarketGUI extends Application {
         infoArea.setText("Welcome to the Supermarket Simulator!\n\nUse the controls to move around and interact with amenities.");
     }
 
+    // Creates the information text area for displaying messages and actions
     private void createControlPanel() {
         controlPanel = new VBox(10);
         controlPanel.setPadding(new Insets(10));
@@ -201,6 +221,7 @@ public class SupermarketGUI extends Application {
         );
     }
 
+    // Creates the status panel at the bottom of the screen
     private VBox createStatusPanel() {
         VBox statusPanel = new VBox(5);
         statusPanel.setPadding(new Insets(10));
@@ -216,6 +237,7 @@ public class SupermarketGUI extends Application {
         return statusPanel;
     }
 
+    // Creates the right-side panel containing shopper info, messages, and controls
     private VBox createRightPanel() {
         VBox rightPanel = new VBox(10);
         rightPanel.setPadding(new Insets(10));
@@ -238,6 +260,7 @@ public class SupermarketGUI extends Application {
         return rightPanel;
     }
 
+    // Updates the entire display including map, shopper position, and status
     private void updateDisplay() {
         // Clear map
         for (int i = 0; i < 22; i++) {
@@ -303,6 +326,7 @@ public class SupermarketGUI extends Application {
         updateStatus();
     }
 
+    // Gets the color for a specific map tile character
     private Color getTileColor(char tileChar) {
         switch (tileChar) {
             case 'W': return Color.DARKGRAY;
@@ -352,11 +376,13 @@ public class SupermarketGUI extends Application {
         }
     }
 
+    // Moves the shopper in the specified direction if possible
     private void moveShopper(String direction) {
         int x = shopper.getX();
         int y = shopper.getY();
         int newX = x, newY = y;
 
+        // Calculate new position based on direction
         switch (direction) {
             case "NORTH": newY = y - 1; break;
             case "SOUTH": newY = y + 1; break;
@@ -364,6 +390,7 @@ public class SupermarketGUI extends Application {
             case "EAST": newX = x + 1; break;
         }
 
+        // Check if movement is possible and update position
         if (supermarket.canMoveTo(newX, newY)) {
             shopper.setPosition(newX, newY);
             infoArea.appendText("\nMoved " + direction);
@@ -373,12 +400,14 @@ public class SupermarketGUI extends Application {
         }
     }
 
+    // Changes the shopper's facing direction
     private void changeDirection(String direction) {
         shopper.setDirection(direction);
         infoArea.appendText("\nNow facing " + direction);
         updateDisplay();
     }
 
+    // Handles interaction with whatever is in front of the shopper
     public void interact() {
     int x = shopper.getX();
     int y = shopper.getY();
@@ -391,6 +420,7 @@ public class SupermarketGUI extends Application {
         case "EAST": frontX++; break;
     }
 
+        // // Check for service first
     Service service = supermarket.getServiceAt(frontX, frontY);
     if (service != null) {
         if (service instanceof ProductSearch) {
@@ -416,6 +446,7 @@ public class SupermarketGUI extends Application {
         return;
     }
 
+        // Check for display if no service found
     Display display = supermarket.getDisplayAt(frontX, frontY);
     if (display != null) {
         openDisplayInteraction(display);
@@ -425,18 +456,21 @@ public class SupermarketGUI extends Application {
     infoArea.appendText("\nNothing to interact with.");
 }
 
+    //Opens a search dialog for finding products by name
     private void openSearchDialog() {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Product Search");
         dialog.setHeaderText("Search for Products");
         dialog.setContentText("Enter product name:");
 
+        // // Process search when dialog is completed
         dialog.showAndWait().ifPresent(productName -> {
             String result = supermarket.findProductLocations(productName);
             infoArea.appendText("\n" + result);
         });
     }
 
+    //  Opens interaction dialog for a display (pick up or return products)
     private void openDisplayInteraction(Display display) {
         Stage interactionStage = new Stage();
         interactionStage.setTitle("Display Interaction - " + display.getAddress());
@@ -448,14 +482,17 @@ public class SupermarketGUI extends Application {
         Label titleLabel = new Label("Interacting with: " + display.getAddress());
         titleLabel.setFont(Font.font("Arial", FontWeight.BOLD, 14));
 
+        // Action buttons for display interaction
         Button pickButton = new Button("Pick Up Product");
         Button returnButton = new Button("Return Product");
         Button cancelButton = new Button("Cancel");
 
+        // Style buttons
         pickButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white;");
         returnButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white;");
         cancelButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white;");
 
+        // Set button actions
         pickButton.setOnAction(e -> {
             interactionStage.close();
             openPickProductDialog(display);
@@ -475,6 +512,7 @@ public class SupermarketGUI extends Application {
         interactionStage.show();
     }
 
+    // Opens dialog for picking up products from a display
     private void openPickProductDialog(Display display) {
         Stage pickStage = new Stage();
         pickStage.setTitle("Pick Up Product");
@@ -496,6 +534,7 @@ public class SupermarketGUI extends Application {
             }
         }
 
+        // Handle empty display
         if (productList.getItems().isEmpty()) {
             productList.getItems().add("Display is empty");
         }
@@ -512,6 +551,7 @@ public class SupermarketGUI extends Application {
                 int slotToRemove = -1;
                 Product selectedProduct = null;
 
+                // Locate the selected product in the display
                 for (int i = 0; i < display.getCapacity(); i++) {
                     Product product = display.getProduct(i);
                     if (product != null) {
@@ -552,6 +592,7 @@ public class SupermarketGUI extends Application {
         pickStage.show();
     }
 
+    // Opens dialog for returning products to a display
     private void openReturnProductDialog(Display display) {
         Stage returnStage = new Stage();
         returnStage.setTitle("Return Product");
@@ -603,6 +644,7 @@ public class SupermarketGUI extends Application {
                     currentIndex++;
                 }
 
+                // Search in equipment if not found in hand-carried
                 if (selectedProduct == null && shopper.getEquipment() != null) {
                     for (Product product : shopper.getEquipment().getProducts()) {
                         if (currentIndex == selectedIndex) {
@@ -614,12 +656,13 @@ public class SupermarketGUI extends Application {
                 }
 
                 if (selectedProduct != null) {
+                    // Validate return conditions
                     if (!display.canHoldProduct(selectedProduct)) {
                         infoArea.appendText("\nThis product cannot be placed in this display!");
                     } else if (display.isFull()) {
                         infoArea.appendText("\nDisplay is full! Cannot return product.");
                     } else {
-                        // Find empty slot
+                        // Find empty slot and return product
                         int emptySlot = -1;
                         for (int i = 0; i < display.getCapacity(); i++) {
                             if (display.getProduct(i) == null) {
@@ -666,6 +709,7 @@ public class SupermarketGUI extends Application {
         // Generate products summary
         StringBuilder summary = new StringBuilder();
 
+         // Show equipment status
         if (shopper.getEquipment() != null) {
             if (shopper.getEquipment() instanceof Basket) {
                 summary.append("Equipment: Basket\n");
@@ -678,15 +722,17 @@ public class SupermarketGUI extends Application {
 
         summary.append("====================\n\n");
 
-        // Count products
+        // Count products and calculate totals
         Map<String, Integer> productCounts = new HashMap<>();
         Map<String, Double> productPrices = new HashMap<>();
 
+        // Count hand-carried products
         for (Product product : shopper.getHandCarried()) {
             productCounts.put(product.getName(), productCounts.getOrDefault(product.getName(), 0) + 1);
             productPrices.put(product.getName(), product.getPrice());
         }
 
+        // Count equipment products
         if (shopper.getEquipment() != null) {
             for (Product product : shopper.getEquipment().getProducts()) {
                 productCounts.put(product.getName(), productCounts.getOrDefault(product.getName(), 0) + 1);
@@ -694,6 +740,7 @@ public class SupermarketGUI extends Application {
             }
         }
 
+        // Build product list with quantities and prices
         double total = 0;
         for (Map.Entry<String, Integer> entry : productCounts.entrySet()) {
             String productName = entry.getKey();
@@ -721,18 +768,21 @@ public class SupermarketGUI extends Application {
         productsStage.show();
     }
 
+    // Shows restart dialog when exiting the supermarket
     private void showRestartDialog() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Exit Supermarket");
         alert.setHeaderText("You have left the supermarket!");
         alert.setContentText("Do you want to restart the simulation or exit the program?");
 
+        // Custom button options
         ButtonType restartButton = new ButtonType("Restart");
         ButtonType exitButton = new ButtonType("Exit");
         ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
 
         alert.getButtonTypes().setAll(restartButton, exitButton, cancelButton);
 
+        // Handle user choice
         alert.showAndWait().ifPresent(response -> {
             if (response == restartButton) {
                 // Restart the simulation
