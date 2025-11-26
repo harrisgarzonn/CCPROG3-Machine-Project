@@ -5,12 +5,12 @@ public class Table extends Display {
     private String[] allowedTypes;
     private Product[] products;
 
-    // Main constructor
+    // Main constructor - FIXED: Allow all table product types
     public Table(String address) {
-        super(address, 4, new String[]{"FRUIT"}); // Same as the last file this uses the same format
+        super(address, 4, new String[]{"FRUIT", "VEGETABLE", "BREAD", "EGGS"});
         this.address = address;
         this.capacity = 4;
-        this.allowedTypes = new String[]{"FRUIT"};
+        this.allowedTypes = new String[]{"FRUIT", "VEGETABLE", "BREAD", "EGGS"};
         this.products = new Product[4];
     }
 
