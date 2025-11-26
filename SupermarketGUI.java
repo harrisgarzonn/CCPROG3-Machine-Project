@@ -380,49 +380,50 @@ public class SupermarketGUI extends Application {
     }
 
     public void interact() {
-        int x = shopper.getX();
-        int y = shopper.getY();
-        int frontX = x, frontY = y;
+    int x = shopper.getX();
+    int y = shopper.getY();
+    int frontX = x, frontY = y;
 
-        switch (shopper.getDirection()) {
-            case "NORTH": frontY--; break;
-            case "SOUTH": frontY++; break;
-            case "WEST": frontX--; break;
-            case "EAST": frontX++; break;
-        }
-
-        Service service = supermarket.getServiceAt(frontX, frontY);
-        if (service != null) {
-            if (service instanceof ProductSearch) {
-                openSearchDialog();
-            } else if (service instanceof Stairs) {
-                supermarket.switchFloor();
-                String newFloor = supermarket.getCurrentFloor();
-                infoArea.appendText("\nYou took the stairs to the " +
-                        (newFloor.equals("GF") ? "Ground Floor" : "Second Floor") + "!");
-                floorLabel.setText("Floor: " + newFloor);
-                updateDisplay();
-            } else if (service instanceof Exit) {
-                String result = service.interact(shopper);
-                infoArea.appendText("\n" + result);
-                // Don't update display after exit - let the exit handler close the program
-                return;
-            } else {
-                String result = service.interact(shopper);
-                infoArea.appendText("\n" + result);
-                updateDisplay();
-            }
-            return;
-        }
-
-        Display display = supermarket.getDisplayAt(frontX, frontY);
-        if (display != null) {
-            openDisplayInteraction(display);
-            return;
-        }
-
-        infoArea.appendText("\nNothing to interact with.");
+    switch (shopper.getDirection()) {
+        case "NORTH": frontY--; break;
+        case "SOUTH": frontY++; break;
+        case "WEST": frontX--; break;
+        case "EAST": frontX++; break;
     }
+
+    Service service = supermarket.getServiceAt(frontX, frontY);
+    if (service != null) {
+        if (service instanceof ProductSearch) {
+            openSearchDialog();
+        } else if (service instanceof Stairs) {
+            supermarket.switchFloor();
+            String newFloor = supermarket.getCurrentFloor();
+            infoArea.appendText("\nYou took the stairs to the " + 
+                (newFloor.equals("GF") ? "Ground Floor" : "Second Floor") + "!");
+            floorLabel.setText("Floor: " + newFloor);
+            updateDisplay();
+        } else if (service instanceof Exit) {
+            String result = service.interact(shopper);
+            infoArea.appendText("\n" + result);
+            
+            // Show restart confirmation dialog
+            showRestartDialog();
+        } else {
+            String result = service.interact(shopper);
+            infoArea.appendText("\n" + result);
+            updateDisplay();
+        }
+        return;
+    }
+
+    Display display = supermarket.getDisplayAt(frontX, frontY);
+    if (display != null) {
+        openDisplayInteraction(display);
+        return;
+    }
+
+    infoArea.appendText("\nNothing to interact with.");
+}
 
     private void openSearchDialog() {
         TextInputDialog dialog = new TextInputDialog();
@@ -718,6 +719,61 @@ public class SupermarketGUI extends Application {
         Scene scene = new Scene(layout, 450, 400);
         productsStage.setScene(scene);
         productsStage.show();
+    }
+
+    private void showRestartDialog() {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Exit Supermarket");
+        alert.setHeaderText("You have left the supermarket!");
+        alert.setContentText("Do you want to restart the simulation or exit the program?");
+
+        ButtonType restartButton = new ButtonType("Restart");
+        ButtonType exitButton = new ButtonType("Exit");
+        ButtonType cancelButton = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        alert.getButtonTypes().setAll(restartButton, exitButton, cancelButton);
+
+        alert.showAndWait().ifPresent(response -> {
+            if (response == restartButton) {
+                // Restart the simulation
+                restartSimulation();
+            } else if (response == exitButton) {
+                // Exit the program
+                System.exit(0);
+            }
+            // If cancel, do nothing and stay in the simulation
+        });
+    }
+
+    private void restartSimulation() {
+        // Reset the supermarket
+        supermarket = new Supermarket();
+
+        // Get new shopper information
+        TextInputDialog nameDialog = new TextInputDialog("John");
+        nameDialog.setTitle("Shopper Information");
+        nameDialog.setHeaderText("Enter Shopper Details");
+        nameDialog.setContentText("Name:");
+
+        TextInputDialog ageDialog = new TextInputDialog("25");
+        ageDialog.setTitle("Shopper Information");
+        ageDialog.setHeaderText("Enter Shopper Details");
+        ageDialog.setContentText("Age:");
+
+        String name = nameDialog.showAndWait().orElse("John");
+        int age = Integer.parseInt(ageDialog.showAndWait().orElse("25"));
+
+        shopper = new Shopper(name, age);
+        supermarket.setShopper(shopper);
+
+        // Clear the info area
+        infoArea.setText("Welcome to the Supermarket Simulator!\n\nUse the controls to move around and interact with amenities.");
+
+        // Update the display
+        updateDisplay();
+
+        infoArea.appendText("\n\n=== NEW SIMULATION STARTED ===");
+        infoArea.appendText("\nWelcome, " + name + "! Age: " + age);
     }
 
     private void updateStatus() {
