@@ -17,6 +17,15 @@ public class Supermarket {
         initializeMap();
     }
 
+    // Add these getter methods
+    public char[][] getGroundFloor() {
+        return groundFloor;
+    }
+
+    public char[][] getSecondFloor() {
+        return secondFloor;
+    }
+
     private void initializeMap() {
         // Initialize ground floor
         for (int i = 0; i < 22; i++) {
@@ -73,15 +82,31 @@ public class Supermarket {
 
     private void addDisplays() {
         // GROUND FLOOR DISPLAYS
-        // Chilled counters
+        // Chilled counters - FIXED: Add all chilled counters
+        int chilledCounterCount = 1;
+
+        // First row: positions 1-6
         for (int x = 1; x <= 6; x++) {
-            addDisplay("GF, Chilled Counter " + x, new ChilledCounter("GF, Chilled Counter " + x), x, 1, "GF");
+            addDisplay("GF, Chilled Counter " + chilledCounterCount, new ChilledCounter("GF, Chilled Counter " + chilledCounterCount), x, 1, "GF");
+            chilledCounterCount++;
         }
+
+        // Second row: positions 8-9
         for (int x = 8; x <= 9; x++) {
-            addDisplay("GF, Chilled Counter " + x, new ChilledCounter("GF, Chilled Counter " + x), x, 1, "GF");
+            addDisplay("GF, Chilled Counter " + chilledCounterCount, new ChilledCounter("GF, Chilled Counter " + chilledCounterCount), x, 1, "GF");
+            chilledCounterCount++;
         }
+
+        // Third row: positions 10-13
+        for (int x = 10; x <= 13; x++) {
+            addDisplay("GF, Chilled Counter " + chilledCounterCount, new ChilledCounter("GF, Chilled Counter " + chilledCounterCount), x, 1, "GF");
+            chilledCounterCount++;
+        }
+
+        // Fourth row: positions 15-20
         for (int x = 15; x <= 20; x++) {
-            addDisplay("GF, Chilled Counter " + x, new ChilledCounter("GF, Chilled Counter " + x), x, 1, "GF");
+            addDisplay("GF, Chilled Counter " + chilledCounterCount, new ChilledCounter("GF, Chilled Counter " + chilledCounterCount), x, 1, "GF");
+            chilledCounterCount++;
         }
 
         // Shelves
@@ -117,12 +142,19 @@ public class Supermarket {
         }
 
         // SECOND FLOOR DISPLAYS
-        // Refrigerators at top
-        for (int x = 2; x <= 5; x++) {
-            addDisplay("2F, Refrigerator " + (x - 1), new Refrigerator("2F, Refrigerator " + (x - 1)), x, 1, "2F");
+        // Refrigerators at top - FIXED: Add refrigerators at correct positions
+        int refrigeratorCount = 1;
+        for (int x = 3; x <= 6; x++) {
+            addDisplay("2F, Refrigerator " + refrigeratorCount, new Refrigerator("2F, Refrigerator " + refrigeratorCount), x, 1, "2F");
+            refrigeratorCount++;
         }
         for (int x = 9; x <= 12; x++) {
-            addDisplay("2F, Refrigerator " + (x - 5), new Refrigerator("2F, Refrigerator " + (x - 5)), x, 1, "2F");
+            addDisplay("2F, Refrigerator " + refrigeratorCount, new Refrigerator("2F, Refrigerator " + refrigeratorCount), x, 1, "2F");
+            refrigeratorCount++;
+        }
+        for (int x = 15; x <= 18; x++) {
+            addDisplay("2F, Refrigerator " + refrigeratorCount, new Refrigerator("2F, Refrigerator " + refrigeratorCount), x, 1, "2F");
+            refrigeratorCount++;
         }
 
         // Second floor shelves
@@ -144,7 +176,7 @@ public class Supermarket {
             }
         }
 
-        // Second floor tables (vegetables, bread, eggs)
+        // Second floor tables
         tableCount = 1;
         for (int x = 10; x <= 11; x++) {
             for (int y = 4; y <= 7; y++) {
@@ -206,8 +238,8 @@ public class Supermarket {
         groundFloor[15][8] = '?';
         groundFloor[15][13] = '?';
 
-        services.add(new Exit(10, 21, "GF"));
-        groundFloor[20][1] = 'B';
+        services.add(new BasketStation(20, 1, "GF"));
+        groundFloor[1][20] = 'B';
 
         services.add(new CartStation(20, 20, "GF"));
         groundFloor[20][20] = 'R';
@@ -249,7 +281,6 @@ public class Supermarket {
         for (Display display : displays.values()) {
             if (display instanceof ChilledCounter) {
                 if (productCount % 3 == 1) {
-                    // Use proper format: CHKXXXXX (3 letters + 5 digits)
                     display.addProduct(new Product(
                             String.format("CHK%05d", productCount),
                             "Chicken Breast", 180.0, "CHICKEN"), 0);
@@ -322,19 +353,21 @@ public class Supermarket {
 
         int groupIndex = 0;
         for (Display display : displays.values()) {
-            if (display instanceof Shelf && groupIndex < shelfProductGroups.length) {
-                String[][] productGroup = shelfProductGroups[groupIndex];
-                for (int i = 0; i < productGroup.length && i < display.getCapacity(); i++) {
-                    String[] productData = productGroup[i];
-                    Product product = new Product(
-                            productData[0],
-                            productData[1],
-                            Double.parseDouble(productData[2]),
-                            productData[3]
-                    );
-                    display.addProduct(product, i);
+            if (display instanceof Shelf && display.getAddress().startsWith("GF")) {
+                if (groupIndex < shelfProductGroups.length) {
+                    String[][] productGroup = shelfProductGroups[groupIndex];
+                    for (int i = 0; i < productGroup.length && i < display.getCapacity(); i++) {
+                        String[] productData = productGroup[i];
+                        Product product = new Product(
+                                productData[0],
+                                productData[1],
+                                Double.parseDouble(productData[2]),
+                                productData[3]
+                        );
+                        display.addProduct(product, i);
+                    }
+                    groupIndex++;
                 }
-                groupIndex++;
             }
         }
     }
@@ -352,7 +385,6 @@ public class Supermarket {
             if (display instanceof Table && display.getAddress().startsWith("GF") && groupIndex < fruitGroups.length) {
                 String[] fruits = fruitGroups[groupIndex];
                 for (int i = 0; i < fruits.length && i < display.getCapacity(); i++) {
-                    // Generate proper serial number format: FRUXXXXX (3 letters + 5 digits)
                     int serialNum = (groupIndex * 3 + i + 1);
                     String serialNumber = String.format("FRU%05d", serialNum);
 
@@ -453,19 +485,34 @@ public class Supermarket {
 
         int groupIndex = 0;
         for (Display display : displays.values()) {
-            if (display instanceof Shelf && display.getAddress().startsWith("2F") && groupIndex < shelf2ProductGroups.length) {
-                String[][] productGroup = shelf2ProductGroups[groupIndex];
-                for (int i = 0; i < productGroup.length && i < display.getCapacity(); i++) {
-                    String[] productData = productGroup[i];
-                    Product product = new Product(
-                            productData[0],
-                            productData[1],
-                            Double.parseDouble(productData[2]),
-                            productData[3]
-                    );
-                    display.addProduct(product, i);
+            if (display instanceof Shelf && display.getAddress().startsWith("2F")) {
+                if (groupIndex < shelf2ProductGroups.length) {
+                    String[][] productGroup = shelf2ProductGroups[groupIndex];
+                    for (int i = 0; i < productGroup.length && i < display.getCapacity(); i++) {
+                        String[] productData = productGroup[i];
+                        Product product = new Product(
+                                productData[0],
+                                productData[1],
+                                Double.parseDouble(productData[2]),
+                                productData[3]
+                        );
+                        display.addProduct(product, i);
+                    }
+                    groupIndex++;
+                } else {
+                    // Use last group if we run out
+                    String[][] productGroup = shelf2ProductGroups[shelf2ProductGroups.length - 1];
+                    for (int i = 0; i < productGroup.length && i < display.getCapacity(); i++) {
+                        String[] productData = productGroup[i];
+                        Product product = new Product(
+                                productData[0],
+                                productData[1],
+                                Double.parseDouble(productData[2]),
+                                productData[3]
+                        );
+                        display.addProduct(product, i);
+                    }
                 }
-                groupIndex++;
             }
         }
     }
@@ -491,19 +538,34 @@ public class Supermarket {
 
         int groupIndex = 0;
         for (Display display : displays.values()) {
-            if (display instanceof Table && display.getAddress().startsWith("2F") && groupIndex < table2ProductGroups.length) {
-                String[][] productGroup = table2ProductGroups[groupIndex];
-                for (int i = 0; i < productGroup.length && i < display.getCapacity(); i++) {
-                    String[] productData = productGroup[i];
-                    Product product = new Product(
-                            productData[0],
-                            productData[1],
-                            Double.parseDouble(productData[2]),
-                            productData[3]
-                    );
-                    display.addProduct(product, i);
+            if (display instanceof Table && display.getAddress().startsWith("2F")) {
+                if (groupIndex < table2ProductGroups.length) {
+                    String[][] productGroup = table2ProductGroups[groupIndex];
+                    for (int i = 0; i < productGroup.length && i < display.getCapacity(); i++) {
+                        String[] productData = productGroup[i];
+                        Product product = new Product(
+                                productData[0],
+                                productData[1],
+                                Double.parseDouble(productData[2]),
+                                productData[3]
+                        );
+                        display.addProduct(product, i);
+                    }
+                    groupIndex++;
+                } else {
+                    // Use last group if we run out
+                    String[][] productGroup = table2ProductGroups[table2ProductGroups.length - 1];
+                    for (int i = 0; i < productGroup.length && i < display.getCapacity(); i++) {
+                        String[] productData = productGroup[i];
+                        Product product = new Product(
+                                productData[0],
+                                productData[1],
+                                Double.parseDouble(productData[2]),
+                                productData[3]
+                        );
+                        display.addProduct(product, i);
+                    }
                 }
-                groupIndex++;
             }
         }
     }
@@ -690,7 +752,9 @@ class Exit extends Service {
 
         // Allow shopper to leave
         shopper.setLeft(true);
-        return "You have left the supermarket. Thank you for shopping!";
+
+        // Return a special message that the GUI can handle
+        return "EXIT_CONFIRMED";
     }
 }
 
