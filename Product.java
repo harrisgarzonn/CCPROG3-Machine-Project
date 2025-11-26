@@ -32,7 +32,8 @@ public class Product {
         return type;
     }
 
-    // Check if product is food
+    // Check if product is a food item
+    // return true if product is food , false otherwise
     public boolean isFood() {
         return type.equals("FRUIT") || type.equals("VEGETABLE") || type.equals("CHICKEN") ||
                 type.equals("BEEF") || type.equals("SEAFOOD") || type.equals("BREAD") ||
@@ -42,6 +43,7 @@ public class Product {
     }
 
     // Check if product is beverage
+    // return true if the product is a beverage, false otherwise
     public boolean isBeverage() {
         return type.equals("SOFT_DRINK") || type.equals("JUICE") || type.equals("ALCOHOL") ||
                 type.equals("MILK");
@@ -71,3 +73,4 @@ public class Product {
         }
     }
 }
+
