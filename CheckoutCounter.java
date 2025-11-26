@@ -3,24 +3,42 @@ import java.util.List;
 import java.io.FileWriter;
 import java.io.IOException;
 
-/*
-  Checkout counter service where shoppers can pay for their products.
-  Generates receipts and applies senior citizen discounts.
+/**
+ * Represents a checkout counter service where shoppers can finalize their purchases.
+ * Generates a detailed receipt showing all products, prices, applicable discounts,
+ * and saves the receipt to a text file.
+ *
+ * @author Bien Gabriel L. Manoos, Harris Martin Garzon
+ * @version 2.0
  */
-
 public class CheckoutCounter extends Service {
+    /**
+     * Constructs a new CheckoutCounter at the specified location.
+     *
+     * @param x the x-coordinate of the checkout counter
+     * @param y the y-coordinate of the checkout counter
+     * @param floor the floor level where the checkout counter is located
+     */
     public CheckoutCounter(int x, int y, String floor) {
         super("CHECKOUT", x, y, floor);
     }
 
+    /**
+     * Processes the checkout for a shopper, generating a detailed receipt.
+     * The receipt includes customer information, itemized product list with prices,
+     * any applicable senior citizen discounts, total cost, and is saved to a file.
+     * The shopper's checkout status is set to true after successful checkout.
+     *
+     * @param shopper the shopper checking out their products
+     * @return a formatted receipt string showing all purchase details, or an error
+     *         message if the shopper has no products to checkout
+     */
     @Override
     public String interact(Shopper shopper) {
-        // Check if shopper has any products to checkout
         if (shopper.getTotalProductCount() == 0) {
             return "You have no products to checkout!";
         }
 
-        // Build receipt
         StringBuilder receipt = new StringBuilder();
         receipt.append("=== RECEIPT ===\n");
         receipt.append("Customer: ").append(shopper.getName()).append("\n");
@@ -30,7 +48,7 @@ public class CheckoutCounter extends Service {
         double discountedTotal = 0;
         boolean hasDiscount = false;
 
-        // Collect all products from shopper (hand-carried and equipment)
+        // Collect all products from hand-carried and equipment
         List<Product> allProducts = new ArrayList<>();
         allProducts.addAll(shopper.getHandCarried());
         if (shopper.getEquipment() != null) {
@@ -39,18 +57,16 @@ public class CheckoutCounter extends Service {
             }
         }
 
-        // Calculate prices and discounts for each product
+        // Process each product and calculate totals
         for (Product product : allProducts) {
             double price = product.getPrice();
             double discountRate = shopper.getSeniorDiscount(product);
             double discount = discountRate * price;
             double finalPrice = price - discount;
 
-            // Add product line to receipt
             receipt.append(String.format("%s (SN: %s) - PHP %.2f",
                     product.getName(), product.getSerialNumber(), price));
 
-            // Add discount information if applicable
             if (discount > 0) {
                 receipt.append(String.format(" - Discount: PHP %.2f (%.0f%% off)",
                         discount, discountRate * 100));
@@ -62,7 +78,6 @@ public class CheckoutCounter extends Service {
             discountedTotal += finalPrice;
         }
 
-        // Add totals to receipt
         receipt.append("\nTotal: PHP ").append(String.format("%.2f", total));
 
         if (hasDiscount) {
@@ -82,7 +97,6 @@ public class CheckoutCounter extends Service {
             receipt.append("\n\nWarning: Could not save receipt to file.");
         }
 
-        // Mark shopper as checked out and clear their products/equipment
         shopper.setCheckedOut(true);
         return receipt.toString();
     }
